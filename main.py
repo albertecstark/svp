@@ -52,7 +52,6 @@ def check_in(a,b,c,d,e):
         exit(0)
 
 #generating depth list
-depth = []
 depth =  -1 * gsw.z_from_p(pressure, lat)
 
 #defining sound speed function
@@ -68,20 +67,24 @@ speeds_calc = sound_speed_deriv(conductivity, temperature, pressure, lat, long)
 #region calculations on data
 #TODO: implement proper second derivative implementation
 def print_properties_data():
+    LD_index = speeds_from_dataset.index(max(speeds_from_dataset))
+    LD = depth[LD_index]
     BD = 0
-    m_index = speeds_from_dataset.index(max(speeds_from_dataset))
-    LD = depth[m_index]
     if LD < 60 :
         BD = 17 * math.sqrt(LD)
     else:
         BD = LD + 60
-    print(f"LD = {LD} and BD = {BD} for the given data")
+    print(f"LD_index = {LD_index}, LD = {LD} and BD = {BD} for the given data")
 
-#make this work later figure out (AttributeError: 'numpy.ndarray' object has no attribute 'index')
 def print_properties_calc():
-    #LD  = list(depth).index(speeds_calc.index(max(speeds_calc)))
+    LD_index = np.argmax(speeds_calc)
+    LD = depth[LD_index]
     BD = 0
-    #print(f"LD = {LD} and BD = {BD} for the derived data")
+    if LD < 60 :
+        BD = 17 * math.sqrt(LD)
+    else:
+        BD = LD + 60
+    print(f"LD_index = {LD_index}, LD = {LD} and BD = {BD} for the derived data")
 #endregion
 
 #region image generation
@@ -107,16 +110,29 @@ def gen_img_deviations():
 def gen_img_propagation_paths():
     #propagation paths
     #TODO propagation paths
+    time = 0.00005 # "seconds"
+    dt = 0.00001
+    timesteps = int(time/dt)
+    theta_res = 2
+    values = np.zeros((theta_res, timesteps, 2))
+    #values[theta step][time step][x or y], starts at 0 
+    for i in range(theta_res):
+        for j in range(timesteps):
+            values[i][j] = 2
+    print(values)
+
+
     fig, ax = plt.subplots()
     plt.savefig('paths.png')
 #endregion
 
 def main():
     check_in(pressure, conductivity, temperature, density, speeds_from_dataset)
-    print_properties_calc()
-    print_properties_data()
-    gen_img_svps()
-    gen_img_deviations()
+    #print_properties_calc()
+    #print_properties_data()
+    #gen_img_svps()
+    #gen_img_deviations()
+    gen_img_propagation_paths()
 
 if __name__ == "__main__" :
     main()
